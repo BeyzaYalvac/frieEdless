@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "912395451551",
+    "project_id": "friendless-cfbb4",
+    "storage_bucket": "friendless-cfbb4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:912395451551:android:daeb69a47a7bc08f01f6aa",
+        "android_client_info": {
+          "package_name": "com.example.friendless"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7apio1ChA8WQ55nMDjLZNghcTJ0E1Uuw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
