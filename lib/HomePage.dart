@@ -14,127 +14,123 @@ class HomePage extends StatefulWidget {
   @override
   State<HomePage> createState() => _HomePageState();
 }
+
 FirebaseFirestore obje = FirebaseFirestore.instance;
 CollectionReference objectCollectionRef =
-FirebaseFirestore.instance.collection(('Questions'));
+FirebaseFirestore.instance.collection('Questions');
 
-int i=1;
-int score=0;
+int i = 1;
+int score = 0;
+
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Friendless'),
+        title: Text('Friendless - Personality test'),
         centerTitle: true,
+        backgroundColor: Theme.of(context).hintColor,
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          Center(
-            child: Text(
-              "Personality Test",
-              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 36),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(colors: [
+            Color(0xff8974b2),
+            Color(0xffb74f00),
+          ]),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Center(
+              child: Text(
+                "Personality Test",
+                style: TextStyle(color: Colors.white,fontWeight: FontWeight.w500, fontSize: 36),
+              ),
+            ),
+            Container(
+              height: MediaQuery.of(context).size.height * 0.25,
+              width: MediaQuery.of(context).size.width * 0.9,
+              decoration: BoxDecoration(
+                color: Theme.of(context).hintColor,
+              ),
+              child: Center(
+                child: FutureBuilder<String>(
+                  future: giveQuestion(context, i),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else {
+                      return Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: Text(
+                          snapshot.data ?? '',
+                          style: TextStyle( color: Colors.white,
+                              fontWeight: FontWeight.w500, fontSize: 20),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ),
+            Column(
+              children: [
+                buildButton(context, "Strongly Agree", 2),
+                buildButton(context, "Agree", 1),
+                buildButton(context, "Neutral", 0),
+                buildButton(context, "Disagree", -1),
+                buildButton(context, "Strongly Disagree", -2),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildButton(BuildContext context, String text, int scoreIncrement) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5.0),
+      child: SizedBox(
+        width: double.infinity,
+        height: 50,
+        child: TextButton(
+          style: TextButton.styleFrom(
+            backgroundColor: Color(0x3df2a1b6),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero,
             ),
           ),
-          Container(
-            height: MediaQuery.of(context).size.height * 0.25,
-            width: MediaQuery.of(context).size.width * 0.9,
-            decoration: BoxDecoration(
-              color: Colors.deepPurple,
-              border: Border.all(width: 6),
-            ),
-            child: FutureBuilder<String>(
-              future: giveQuestion(context,i),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else {
-                  return Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: Text(
-                      snapshot.data ?? '',
-                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
-                    ),
-                  );
-                }
-              },
+          onPressed: () async {
+            setState(() {
+              score += scoreIncrement;
+              print(score);
+              i++;
+            });
+          },
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.white,
             ),
           ),
-          Column(
-            children: [
-              OutlinedButton(
-                onPressed: () async {
-                  setState(() {
-                    i++;// Soru sayısını bir artır
-                    score+=2;
-                    print(score);
-
-                  });
-                },
-                child: Text("Strongly Agree"),
-              ),
-              OutlinedButton(
-                onPressed: () async {
-                  setState(() {
-                    i++; // Soru sayısını bir artır
-                    score+=1;
-                    print(score);
-
-                  });
-                },
-                child: Text("Agree"),
-              ),
-              OutlinedButton(
-                onPressed: () async {
-                  setState(() {
-                    i++; // Soru sayısını bir artır
-                    score+=0;
-                    print(score);
-
-                  });
-                },
-                child: Text("Neutral"),
-              ),
-              OutlinedButton(
-                onPressed: () async {
-                  setState(() {
-                    i++; // Soru sayısını bir artır
-                    score-=1;
-                    print(score);
-
-                  });
-                },
-                child: Text("Disagree"),
-              ),  OutlinedButton(
-                onPressed: () async {
-                  setState(() {
-                    i++;
-                    score-=2;
-                    print(score);
-
-                  });
-                },
-                child: Text("Strongly Disagree"),
-              ),
-            ],
-          ),
-        ],
+        ),
       ),
     );
   }
 }
 
 Future<String> giveQuestion(BuildContext context, int sayi) async {
-  if (sayi == 11) {
-
+  if (sayi == 12) {
+    await Future.delayed(Duration.zero);
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => CongPage(score)),
     );
-    return "11. soru"; // Örnek bir dönüş
+    return '';
   } else {
     var truvaRef = objectCollectionRef.doc('question${sayi}');
     var response = await truvaRef.get();
@@ -142,5 +138,3 @@ Future<String> giveQuestion(BuildContext context, int sayi) async {
     return rData;
   }
 }
-
-
