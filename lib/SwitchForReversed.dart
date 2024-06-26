@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class SwitchPage extends StatefulWidget {
-  const SwitchPage({Key? key}) : super(key: key);
+import 'ChatPage.dart';
+
+class SwitchForReversedPage extends StatefulWidget {
+  const SwitchForReversedPage({Key? key}) : super(key: key);
 
   @override
-  _SwitchPageState createState() => _SwitchPageState();
+  _SwitchForReversedPageState createState() => _SwitchForReversedPageState();
 }
 
-class _SwitchPageState extends State<SwitchPage> {
+class _SwitchForReversedPageState extends State<SwitchForReversedPage> {
   List<Map<String, dynamic>> persons = [];
   List<Map<String, dynamic>> rightSwipedPersons = [];
   int currentIndex = 0;
@@ -25,7 +27,7 @@ class _SwitchPageState extends State<SwitchPage> {
 
     setState(() {
       persons = documents.map((doc) => doc.data() as Map<String, dynamic>).where((person) =>
-      ['social', 'Extrovert', 'Neutral'].contains(person['person_personality'])).toList();
+          ['introverted','reversed'].contains(person['person_personality'])).toList();
     });
   }
 
@@ -37,54 +39,59 @@ class _SwitchPageState extends State<SwitchPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        height: double.infinity,
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(colors: [
-            Color(0xff8974b2),
-            Color(0xffb74f00),
-          ]),
-        ),
-        child: Center(
-          child: persons.isEmpty
-              ? CircularProgressIndicator()
-              : Dismissible(
-            key: UniqueKey(),
-            direction: DismissDirection.horizontal,
-            onDismissed: (direction) {
-              if (direction == DismissDirection.startToEnd) {
-                rightSwipedPersons.add(persons[currentIndex]);
-              }
-              setState(() {
-                currentIndex += 1;
-              });
+    return WillPopScope(
+      onWillPop: () async{
+        return false;
+      },
+      child: Scaffold(
+        body: Container(
+          height: double.infinity,
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(colors: [
+              Color(0xff8974b2),
+              Color(0xffb74f00),
+            ]),
+          ),
+          child: Center(
+            child: persons.isEmpty
+                ? CircularProgressIndicator()
+                : Dismissible(
+              key: UniqueKey(),
+              direction: DismissDirection.horizontal,
+              onDismissed: (direction) {
+                if (direction == DismissDirection.startToEnd) {
+                  rightSwipedPersons.add(persons[currentIndex]);
+                }
+                setState(() {
+                  currentIndex += 1;
+                });
 
-              if (currentIndex >= persons.length) {
-                _goToChatPeople(context);
-              } else {
-                String action = direction == DismissDirection.startToEnd ? 'sağa' : 'sola';
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('${persons[currentIndex - 1]['person_name']} $action kaydırıldı')),
-                );
-              }
-            },
-            background: Container(
-              color: Color(0xff8974b2),
-              alignment: Alignment.centerLeft,
-              padding: EdgeInsets.symmetric(horizontal: 20.0),
-              child: Icon(Icons.check, color: Colors.white),
+                if (currentIndex >= persons.length) {
+                  _goToChatPeople(context);
+                } else {
+                  String action = direction == DismissDirection.startToEnd ? 'sağa' : 'sola';
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('${persons[currentIndex - 1]['person_name']} $action kaydırıldı')),
+                  );
+                }
+              },
+              background: Container(
+                color: Color(0xff8974b2),
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.symmetric(horizontal: 20.0),
+                child: Icon(Icons.check, color: Colors.white),
+              ),
+              secondaryBackground: Container(
+                color: Color(0xffb74f00),
+                alignment: Alignment.centerRight,
+                padding: EdgeInsets.symmetric(horizontal: 20.0),
+                child: Icon(Icons.delete, color: Colors.white),
+              ),
+              child: currentIndex < persons.length
+                  ? _buildCard(persons[currentIndex])
+                  : Container(), // Handle case when all cards are swiped
             ),
-            secondaryBackground: Container(
-              color: Color(0xffb74f00),
-              alignment: Alignment.centerRight,
-              padding: EdgeInsets.symmetric(horizontal: 20.0),
-              child: Icon(Icons.delete, color: Colors.white),
-            ),
-            child: currentIndex < persons.length
-                ? _buildCard(persons[currentIndex])
-                : Container(), // Handle case when all cards are swiped
           ),
         ),
       ),
@@ -206,73 +213,83 @@ class ChatPeople extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).hintColor,
-        title: Text('Your Favorite People'),
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: SweepGradient(
-            colors: [
-              Color(0xff8974b2),
-              Color(0xffb74f00),
-            ],
-          ),
+    return WillPopScope(
+      onWillPop: () async{
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).hintColor,
+          title: Text('Your Favorite People'),
         ),
-        child: Center(
-          child: rightSwipedPersons.isEmpty
-              ? Text('No people swiped right.')
-              : ListView.builder(
-            itemCount: rightSwipedPersons.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Card(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: SweepGradient(
+              colors: [
+                Color(0xff8974b2),
+                Color(0xffb74f00),
+              ],
+            ),
+          ),
+          child: Center(
+            child: rightSwipedPersons.isEmpty
+                ? Text('No people swiped right.')
+                : ListView.builder(
+              itemCount: rightSwipedPersons.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Card(
 
-                  shadowColor: Colors.black,
-                  color: Color(0x3df2a1b6),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  elevation: 8,
-                  child: ListTile(
+                    shadowColor: Colors.black,
+                    color: Color(0x3df2a1b6),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    elevation: 8,
+                    child: ListTile(
 
-                    contentPadding: EdgeInsets.all(16.0),
-                    title: Text(
-                      '${rightSwipedPersons[index]['person_name']} ${rightSwipedPersons[index]['person_surname']}',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
-                    subtitle: Text(
-                      'Age: ${rightSwipedPersons[index]['person_age']} | Country: ${rightSwipedPersons[index]['person_country']}',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 16,
-                      ),
-                    ),
-                    leading: CircleAvatar(
-                      backgroundColor: Colors.white,
-                      child: Text(
-                        rightSwipedPersons[index]['person_name'][0],
+                      contentPadding: EdgeInsets.all(16.0),
+                      title: Text(
+                        '${rightSwipedPersons[index]['person_name']} ${rightSwipedPersons[index]['person_surname']}',
                         style: TextStyle(
-                          color: Colors.deepPurpleAccent,
+                          color: Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 24,
+                          fontSize: 20,
                         ),
                       ),
+                      subtitle: Text(
+                        'Age: ${rightSwipedPersons[index]['person_age']} | Country: ${rightSwipedPersons[index]['person_country']}',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 16,
+                        ),
+                      ),
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.white,
+                        child: Text(
+                          rightSwipedPersons[index]['person_name'][0],
+                          style: TextStyle(
+                            color: Colors.deepPurpleAccent,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 24,
+                          ),
+                        ),
+                      ),
+                      trailing: Icon(Icons.message), // Mesaj ikonu
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChatPage(rightSwipedPersons: rightSwipedPersons,index: index,),
+                          ),
+                        );
+                      },
                     ),
-                    trailing: Icon(Icons.message), // Mesaj ikonu
-                    onTap: () {
-                      Navigator.pushNamed(context,'/chatPage');
-                    },
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ),

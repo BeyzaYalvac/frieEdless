@@ -17,7 +17,7 @@ class HomePage extends StatefulWidget {
 
 FirebaseFirestore obje = FirebaseFirestore.instance;
 CollectionReference objectCollectionRef =
-FirebaseFirestore.instance.collection('Questions');
+obje.collection('Questions');
 
 int i = 1;
 int score = 0;
@@ -26,14 +26,14 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: AppBar(),
+        body: Container(
+        decoration: const BoxDecoration(
+        gradient: LinearGradient(colors: [
         title: Text('Friendless - Personality test'),
         centerTitle: true,
         backgroundColor: Theme.of(context).hintColor,
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(colors: [
             Color(0xff8974b2),
             Color(0xffb74f00),
           ]),
@@ -124,7 +124,7 @@ class _HomePageState extends State<HomePage> {
 }
 
 Future<String> giveQuestion(BuildContext context, int sayi) async {
-  if (sayi == 12) {
+  if (sayi == 11) {
     await Future.delayed(Duration.zero);
     Navigator.push(
       context,

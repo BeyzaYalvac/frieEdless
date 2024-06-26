@@ -17,7 +17,6 @@ class _CongPageState extends State<CongPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: Container(
         decoration: BoxDecoration(color: Colors.green),
         child: Center(
@@ -36,14 +35,23 @@ class _CongPageState extends State<CongPage> {
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 20),
-              Personality(widget.score),
+              Text(
+                _getPersonalityType(widget.score),
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
               SizedBox(height: 20),
               OutlinedButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SwitchPage()),
-                  );
+                  if (widget.score > -20 && widget.score <= -10) {
+                    Navigator.pushNamed(context, '/switchForReversed');
+                  } else if (widget.score > -10 && widget.score <= 0) {
+                    Navigator.pushNamed(context, '/switchForExtroverted');
+                  } else if (widget.score > 0 && widget.score <= 20) {
+                    Navigator.pushNamed(context, '/switchForExtroverted');
+                  } else {
+                    // Handle scores outside the specified ranges
+                    Navigator.pushNamed(context, '/switchForExtroverted');
+                  }
                 },
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(color: Colors.white),
@@ -64,17 +72,17 @@ class _CongPageState extends State<CongPage> {
     );
   }
 
-  Text Personality(int score) {
+  String _getPersonalityType(int score) {
     if (score > -20 && score <= -10) {
-      return Text('Your personality is: Social', style: TextStyle(color: Colors.white, fontSize: 20));
-    } else if (score > -10 && score <= 0) {
-      return Text('Your personality is: Extrovert', style: TextStyle(color: Colors.white, fontSize: 20));
+      return ' Reserved';
+    } else if (score > -10 && score < 0) {
+      return ' Introverted';
+    } else if (score == 0) {
+      return 'Neutral';
     } else if (score > 0 && score <= 10) {
-      return Text('Your personality is: Neutral', style: TextStyle(color: Colors.white, fontSize: 20));
-    } else if (score > 10 && score <= 20) {
-      return Text('Your personality is: Introverted', style: TextStyle(color: Colors.white, fontSize: 20));
+      return 'Extrovert';
     } else {
-      return Text('Your personality is: Reserved', style: TextStyle(color: Colors.white, fontSize: 20));
+      return 'Social';
     }
   }
 }
