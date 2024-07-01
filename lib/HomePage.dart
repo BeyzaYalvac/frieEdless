@@ -41,7 +41,7 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
-            Center(
+            Center(//
               child: Text(
                 "Personality Test",
                 style: TextStyle(color: Colors.white,fontWeight: FontWeight.w500, fontSize: 36),
